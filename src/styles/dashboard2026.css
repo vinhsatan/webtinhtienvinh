@@ -1,0 +1,520 @@
+/* ===== HIGH-END 2026 DASHBOARD UI KIT ===== */
+/* Dark, Sleek, Authoritative - Muted Cyberpunk Aesthetic */
+
+/* ===== BACKGROUND & GRAIN TEXTURE ===== */
+.dashboard-2026-wrapper {
+  background: linear-gradient(135deg, #0B0E11 0%, #0D1015 50%, #0B0E11 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle grain texture overlay */
+.dashboard-2026-wrapper::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.03) 0px,
+      rgba(255, 255, 255, 0.03) 1px,
+      transparent 1px,
+      transparent 2px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.03) 0px,
+      rgba(255, 255, 255, 0.03) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== BENTO GRID LAYOUT ===== */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  padding: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Bento grid items - different sizes */
+.dashboard-grid-item {
+  position: relative;
+}
+
+.dashboard-grid-item.large {
+  grid-column: span 2;
+}
+
+.dashboard-grid-item.tall {
+  grid-row: span 2;
+}
+
+/* ===== GLASSMORPHISM CARD SYSTEM ===== */
+.dashboard-card {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(15, 18, 23, 0.6);
+  border: 1px solid transparent;
+  padding: 20px;
+  height: 100%;
+  min-height: 200px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Soft Ambient Occlusion effect - shadow at edges */
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Hover effect - subtle lift */
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 25px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== GRADIENT BORDER EFFECT ===== */
+/* The laser-cut border technique using background-clip */
+
+/* Group A: Female CEO (Deep Wine + Hot Pink) */
+.dashboard-card.group-a {
+  border: 1px solid transparent;
+  background-image: 
+    linear-gradient(#0F1713, #0F1713),
+    linear-gradient(135deg, #3E1F25 0%, #D12D69 100%);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.dashboard-card.group-a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #D12D69 0%, #FF85A2 50%, #D12D69 100%);
+  border-radius: 12px 0 0 12px;
+  opacity: 0.8;
+}
+
+.dashboard-card.group-a-accent {
+  color: #FF85A2;
+}
+
+.dashboard-card.group-a .card-icon {
+  color: #FF85A2;
+  text-shadow: 0 0 20px rgba(255, 133, 162, 0.3);
+}
+
+/* Group B: Male Businessman (Space Black + Cobalt Blue) */
+.dashboard-card.group-b {
+  border: 1px solid transparent;
+  background-image: 
+    linear-gradient(#0D1117, #0D1117),
+    linear-gradient(135deg, #1F2937 0%, #3B82F6 100%);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.dashboard-card.group-b::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #3B82F6 0%, #60A5FA 50%, #3B82F6 100%);
+  border-radius: 12px 0 0 12px;
+  opacity: 0.8;
+}
+
+.dashboard-card.group-b-accent {
+  color: #60A5FA;
+}
+
+.dashboard-card.group-b .card-icon {
+  color: #60A5FA;
+  text-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
+}
+
+/* Group C: Finance/Investment (Dark Moss + Emerald) */
+.dashboard-card.group-c {
+  border: 1px solid transparent;
+  background-image: 
+    linear-gradient(#0F1713, #0F1713),
+    linear-gradient(135deg, #1B2E25 0%, #10B981 100%);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.dashboard-card.group-c::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #10B981 0%, #34D399 50%, #10B981 100%);
+  border-radius: 12px 0 0 12px;
+  opacity: 0.8;
+}
+
+.dashboard-card.group-c-accent {
+  color: #34D399;
+}
+
+.dashboard-card.group-c .card-icon {
+  color: #34D399;
+  text-shadow: 0 0 20px rgba(52, 211, 153, 0.3);
+}
+
+/* ===== CARD HEADER WITH INDICATOR ===== */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card-header-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 16px;
+}
+
+.card-header-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #B3B3B3;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ===== STAT VALUES ===== */
+.card-stat-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.card-stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.card-stat-label {
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.card-stat-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  width: fit-content;
+}
+
+/* ===== TREND INDICATORS ===== */
+.trend-up {
+  color: #34D399;
+}
+
+.trend-down {
+  color: #FF85A2;
+}
+
+.trend-neutral {
+  color: #60A5FA;
+}
+
+/* ===== CONTENT AREAS ===== */
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  color: #E5E5E5;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ===== TYPOGRAPHY ===== */
+.dashboard-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.dashboard-subtitle {
+  font-size: 14px;
+  color: #888;
+  margin: 8px 0 0 0;
+  font-weight: 400;
+}
+
+/* ===== ACTIVITY LIST CARD ===== */
+.activity-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 13px;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-info {
+  flex: 1;
+}
+
+.activity-label {
+  color: #E5E5E5;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.activity-detail {
+  color: #888;
+  font-size: 12px;
+}
+
+.activity-amount {
+  font-weight: 600;
+  color: #E5E5E5;
+}
+
+/* ===== SCROLL STYLING ===== */
+.dashboard-card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dashboard-card::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dashboard-card::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.dashboard-card::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .dashboard-grid-item.large {
+    grid-column: span 1;
+  }
+
+  .dashboard-grid-item.tall {
+    grid-row: span 1;
+  }
+
+  .dashboard-card {
+    min-height: 180px;
+    padding: 16px;
+  }
+
+  .card-stat-value {
+    font-size: 24px;
+  }
+
+  .dashboard-title {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .dashboard-card {
+    min-height: 160px;
+    padding: 12px;
+  }
+
+  .card-stat-value {
+    font-size: 20px;
+  }
+
+  .card-stat-label {
+    font-size: 11px;
+  }
+
+  .dashboard-title {
+    font-size: 20px;
+  }
+}
+
+/* ===== ANIMATION & TRANSITIONS ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.dashboard-card {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Stagger effect for multiple cards */
+.dashboard-grid-item:nth-child(1) .dashboard-card {
+  animation-delay: 0.05s;
+}
+.dashboard-grid-item:nth-child(2) .dashboard-card {
+  animation-delay: 0.1s;
+}
+.dashboard-grid-item:nth-child(3) .dashboard-card {
+  animation-delay: 0.15s;
+}
+.dashboard-grid-item:nth-child(4) .dashboard-card {
+  animation-delay: 0.2s;
+}
+.dashboard-grid-item:nth-child(5) .dashboard-card {
+  animation-delay: 0.25s;
+}
+.dashboard-grid-item:nth-child(6) .dashboard-card {
+  animation-delay: 0.3s;
+}
+
+/* ===== DARK MODE ENHANCEMENTS ===== */
+@media (prefers-color-scheme: dark) {
+  .dashboard-card {
+    background: rgba(10, 12, 15, 0.7);
+  }
+
+  .card-stat-value {
+    color: #FFFFFF;
+  }
+
+  .dashboard-title {
+    color: #FFFFFF;
+  }
+}
+
+/* ===== NO WHITE - ENFORCED ===== */
+:root {
+  --dashboard-white-blocker: #0B0E11;
+}
+
+/* Block any pure white elements */
+.dashboard-2026-wrapper *:not(svg):not(img) {
+  color-adjust: exact;
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-card,
+  .dashboard-card:hover,
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .dashboard-card {
+    border-width: 2px;
+  }
+
+  .card-header-title {
+    font-weight: 700;
+  }
+
+  .card-stat-value {
+    font-weight: 900;
+  }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .dashboard-2026-wrapper::before {
+    display: none;
+  }
+
+  .dashboard-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
