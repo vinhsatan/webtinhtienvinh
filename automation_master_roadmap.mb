@@ -1,0 +1,126 @@
+# AUTOMATION MASTER ROADMAP v1.0
+
+Created: 2026-02-09
+Scope: Automation-focused roadmap for production automation systems (CI, orchestration, reconciliation, safety, observability).
+
+---
+
+## 1. Purpose
+Provide a concise, actionable roadmap for implementing, hardening, and operating the automation control planes defined in `production_master_blueprint.mb`.
+
+## 2. Guiding Principles
+- Safety-first: simulation, approvals, kill-switch, and audit required before production-impacting automations.
+- Least privilege: scoped tokens and minimal runtimes for executors.
+- Observability: every workflow, decision, and approval is instrumented and logged.
+- Reconciliation: periodic automated reconciliation and manual repair paths.
+
+## 3. Milestones (High Level)
+- M1 (Weeks 0-2): Trigger Registry + Orchestrator connectors (Temporal/Argo) + IAM stub.
+- M2 (Weeks 2-4): PDP rules engine, Simulation Sandbox, and Audit Store (append-only).
+- M3 (Weeks 4-6): Reconciler + Repair Workflows + Reconciliation runbooks.
+- M4 (Weeks 6-8): CI Safety Gates (simulation + policy checks + canary deploys).
+- M5 (Weeks 8-10): Monitoring automation, alert-runbooks, and automatic remediation playbooks.
+- M6 (Weeks 10-12): Kill-switch, quarantine, incident response automation, and drill exercises.
+
+## 4. Deliverables Per Milestone
+- M1: `src/orchestrator/*` connectors, `src/iam/iamService.ts` (stub), Trigger Registry schema + API.
+- M2: `src/pdp/*` rules loader, Simulation harness, Audit appender, `production_master_blueprint.mb` updates.
+- M3: `src/reconciler/*`, repair workflow templates, reconcile reports and alerting integration.
+- M4: GitHub Actions safety pipeline, signed simulation reports, canary promotion job, rollback automation.
+- M5: OpenTelemetry instrumentation, Prometheus metrics, predefined alerts + automated remediation workflows.
+- M6: Global & per-workflow kill-switch, quarantine queue, incident response playbooks, scheduled drills.
+
+## 5. Risks & Mitigations
+- Risk: Automatic fixes corrupt financial data. Mitigation: require 2-party approval for critical repairs; simulation + dry-run mandatory.
+- Risk: Runaway automation. Mitigation: quota enforcement, circuit breakers, and auto-kill thresholds.
+- Risk: Privilege escalation. Mitigation: short-lived scoped tokens and PDP-enforced policies.
+
+## 6. Success Criteria
+- All production-impacting automations require a signed simulation report and PDP pass.
+- Reconciliation runs detect and surface >99% of non-trivial ledger drifts within 1 hour.
+- Kill-switch triggers successfully quiesce 100% of new workflow starts and signal running workflows to checkpoint.
+- CI runs integration tests and policy checks on every PR; canary deploys observe no critical alerts before promotion.
+
+## 7. Next Steps (Immediate)
+- Finalize Trigger Registry APIs and register initial triggers (owner, SLA, safety_level).
+- Wire IAM KMS signer for production token signing and rotate dev key.
+- Configure GitHub Secrets (`DB_CONN`, `IAM_KMS_SIGN_URL`) and run an end-to-end CI integration.
+
+---
+
+Change Log
+- v1.0 — initial roadmap skeleton (2026-02-09)
+
+## Auto-Flow (Automation Pipeline)
+
+This Auto-Flow converts the high-level roadmap into an executable automation pipeline. Each step below is represented in the repository as files/scripts, CI jobs, or TODO tasks.
+
+Flow overview (stages):
+- Stage A: Trigger & Policy (Trigger Registry + PDP)
+- Stage B: Orchestration (Orchestrator service + connectors + IAM tokens)
+- Stage C: Simulation & Approval (Simulation sandbox + signed reports + human approval)
+- Stage D: Execute & Audit (Executor tasks, audit appenders, idempotency)
+- Stage E: Reconciliation & Repair (reconciler jobs + repair workflows)
+- Stage F: Observability & Safety (metrics, alerts, kill-switch, incident automation)
+
+Automated steps and mapping:
+
+1) Register Trigger
+- Action: store trigger record in Trigger Registry (API) with `idempotency_required`, `safety_level`, `data_scope`.
+- Repo: implement API under `src/control/triggerRegistry.ts` (TODO).
+- CI: `automation-safety.yml` enforces PR changes to trigger definitions.
+
+2) PDP Evaluation
+- Action: `pdpService.evaluatePolicy(trigger, payload)` called before token issuance.
+- Repo: rules in `src/pdp/rules.json`, loader in `src/pdp/rulesLoader.ts`.
+- CI: `npm run tooling:policy-check` validates rule changes.
+
+3) Token Issuance
+- Action: Orchestrator requests execution token from `src/iam/iamService.ts` (KMS optional via `IAM_KMS_SIGN_URL`).
+- Security: tokens are short-lived and scoped to minimal actions.
+
+4) Simulation & Approval
+- Action: If `safety_level` high, call simulation harness (`scripts/run-simulation.js`) and produce `simulation/report.json`; require human approval token.
+- CI: `automation-safety.yml` runs simulation on PR and uploads report artifact.
+
+5) Start Workflow
+- Action: Orchestrator starts workflows using Temporal or Argo connectors (`src/orchestrator/*`) with `workflowId = idempotency_key` and execution token attached.
+- Audit: every start/submit appends to `src/audit/auditService.ts`.
+
+6) Execution Observability
+- Action: Executors instrument OTel metrics and emit events to Event Bus; Monitor job evaluates health and anomalies.
+
+7) Reconciliation
+- Action: Reconciler (`src/reconciler/reconciler.ts`) runs periodic windows and emits repair tasks to orchestrator.
+- Safety: critical repairs require 2-party approval; non-critical may run auto-repair workflows.
+
+8) Kill & Recover
+- Action: kill-switch runbook (`docs/runbooks/kill-switch.md`) and orchestrator signals to terminate or checkpoint workflows; quarantine queue for review.
+
+CI wiring and secrets:
+- `.github/workflows/integration-tests.yml` runs `npm ci` and `npm run test:integration` using `DB_CONN` and `IAM_KMS_SIGN_URL` from Secrets.
+- Add `DB_CONN` and `IAM_KMS_SIGN_URL` to repository Secrets before enabling CI.
+
+Execution commands (examples):
+```
+# local simulation
+npm run test:simulation
+
+# policy check
+npm run tooling:policy-check
+
+# run reconciliation (needs DB_CONN)
+npm run reconcile
+
+# run integration tests (CI equivalent)
+npm run test:integration
+```
+
+Owners and estimated durations (first pass):
+- Trigger Registry: Owner: `platform/api` — 1 week
+- Orchestrator + IAM: Owner: `platform/orchestrator` — 2 weeks
+- PDP + Simulation: Owner: `platform/security` — 1 week
+- Reconciler & Repair: Owner: `platform/finance` — 2 weeks
+- Observability & Safety: Owner: `platform/ops` — 1 week
+
+This Auto-Flow is represented as a tracked TODO list in the repository (see project TODO). Mark items complete as implemented and tested.

@@ -1,0 +1,5 @@
+{
+  "id": "sim-1",
+  "name": "payments.refund_requested",
+  "source": { "type": "webhook", "owner": "finance", "safety_level": "high" }
+}

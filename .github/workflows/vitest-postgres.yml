@@ -1,0 +1,45 @@
+name: Vitest (with ephemeral Postgres)
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  vitest-postgres:
+    name: Run Vitest unit + integration with Postgres
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U user -d testdb"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Wait for Postgres
+        run: |
+          until pg_isready -h localhost -p 5432 -U user -d testdb; do sleep 1; done
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+      - name: Run integration tests
+        env:
+          DB_CONN: postgres://user:password@localhost:5432/testdb
+        run: npm run test:integration

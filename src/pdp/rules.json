@@ -1,0 +1,44 @@
+[{
+    "id": "rule-001",
+    "description": "Deny payment refunds by default",
+    "when": { "name": "payments.refund_requested" },
+    "effect": "deny"
+  },
+  {
+    "id": "rule-002",
+    "description": "Require simulation for high safety workflows",
+    "when": { "safety_level": "high" },
+    "effect": "allow",
+    "require_simulation": true
+  },
+  {
+    "id": "rule-003",
+    "description": "Allow all other triggers by default",
+    "when": { "name": "*" },
+    "effect": "allow"
+  }
+]
+[
+  {
+    "id": "rule-001",
+    "description": "Require simulation for high-safety triggers",
+    "when": { "trigger.safety_level": "high" },
+    "require": ["payload.simulation_passed"],
+    "effect": "deny-if-missing",
+    "severity": "high"
+  },
+  {
+    "id": "rule-002",
+    "description": "Webhook triggers cannot write ledger without approval",
+    "when": { "trigger.type": "webhook", "trigger.data_scope": "financial" },
+    "require": ["payload.approval_token"],
+    "effect": "deny-if-missing",
+    "severity": "critical"
+  },
+  {
+    "id": "rule-003",
+    "description": "Default allow",
+    "when": {},
+    "effect": "allow"
+  }
+]

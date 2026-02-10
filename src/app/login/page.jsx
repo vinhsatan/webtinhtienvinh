@@ -7,6 +7,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isAuthenticated } = useAuth();
+  const AUTH_MODE = (import.meta.env.VITE_AUTH_MODE || '').toLowerCase();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -122,17 +123,19 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Chưa có tài khoản?{' '}
-            <Link
-              to="/register"
-              className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
-            >
-              Đăng ký ngay
-            </Link>
-          </p>
-        </div>
+        {AUTH_MODE !== 'single_user' && AUTH_MODE !== 'single-user' && AUTH_MODE !== 'singleuser' && (
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Chưa có tài khoản?{' '}
+              <Link
+                to="/register"
+                className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
+              >
+                Đăng ký ngay
+              </Link>
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

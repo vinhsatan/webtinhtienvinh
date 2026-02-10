@@ -7,6 +7,11 @@ const AuthContext = createContext(null);
 // When accessed from https://app.n8nvinhsatan.site, API calls will go to the same domain
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
+// Auth / mode variables (single-user support)
+const AUTH_MODE = (import.meta.env.VITE_AUTH_MODE || '').toLowerCase();
+const ENV_AUTH_EMAIL = import.meta.env.VITE_AUTH_EMAIL || '';
+const ENV_AUTH_PASSWORD = import.meta.env.VITE_AUTH_PASSWORD || '';
+
 // Chế độ test: không lưu trữ dữ liệu - xóa mỗi lần load (giữ auth)
 const NO_PERSIST = import.meta.env.VITE_NO_PERSIST === 'true';
 
@@ -48,6 +53,10 @@ export function AuthProvider({ children }) {
   }, []);
 
   const register = async (email, password, name) => {
+    // Disable registration in single-user production mode
+    if (AUTH_MODE === 'single_user' || AUTH_MODE === 'single-user' || AUTH_MODE === 'singleuser') {
+      return { success: false, error: 'Registration disabled in single-user mode' };
+    }
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
@@ -74,6 +83,20 @@ export function AuthProvider({ children }) {
   };
 
   const login = async (email, password) => {
+    // If single-user mode is enabled and env credentials are set, validate locally
+    if (AUTH_MODE === 'single_user' || AUTH_MODE === 'single-user' || AUTH_MODE === 'singleuser') {
+      if (email === ENV_AUTH_EMAIL && password === ENV_AUTH_PASSWORD) {
+        const localToken = 'local-single-user-token';
+        const localUser = { email, name: 'Owner' };
+        setToken(localToken);
+        setUser(localUser);
+        localStorage.setItem('auth_token', localToken);
+        localStorage.setItem('auth_user', JSON.stringify(localUser));
+        return { success: true, user: localUser };
+      }
+      return { success: false, error: 'Invalid credentials' };
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',

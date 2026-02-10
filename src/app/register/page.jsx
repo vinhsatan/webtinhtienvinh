@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserPlus, Mail, User, Eye, EyeOff } from 'lucide-react';
@@ -6,6 +6,14 @@ import { UserPlus, Mail, User, Eye, EyeOff } from 'lucide-react';
 export default function RegisterPage() {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const AUTH_MODE = (import.meta.env.VITE_AUTH_MODE || '').toLowerCase();
+
+  useEffect(() => {
+    // Redirect to login when single-user mode is enabled (registration disabled)
+    if (AUTH_MODE === 'single_user' || AUTH_MODE === 'single-user' || AUTH_MODE === 'singleuser') {
+      navigate('/login', { replace: true });
+    }
+  }, [AUTH_MODE, navigate]);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

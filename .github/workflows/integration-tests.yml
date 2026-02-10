@@ -1,0 +1,39 @@
+name: Integration Tests
+
+on:
+  pull_request:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        env:
+          DB_CONN: ${{ secrets.DB_CONN }}
+          IAM_KMS_SIGN_URL: ${{ secrets.IAM_KMS_SIGN_URL }}
+        run: |
+          npm ci
+
+      - name: Run integration tests
+        env:
+          DB_CONN: ${{ secrets.DB_CONN }}
+          IAM_KMS_SIGN_URL: ${{ secrets.IAM_KMS_SIGN_URL }}
+        run: |
+          npm run test:integration
+
+      - name: Upload simulation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: simulation-report
+          path: simulation/report.json

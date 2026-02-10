@@ -24,6 +24,12 @@ export default defineConfig({
   define: {
     'import.meta.env.VITE_N8N_WEBHOOK_URL': JSON.stringify(env.VITE_N8N_WEBHOOK_URL || ''),
     'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL || ''),
+    'import.meta.env.VITE_AUTH_MODE': JSON.stringify(env.VITE_AUTH_MODE || ''),
+    'import.meta.env.VITE_AUTH_EMAIL': JSON.stringify(env.VITE_AUTH_EMAIL || ''),
+    'import.meta.env.VITE_AUTH_PASSWORD': JSON.stringify(env.VITE_AUTH_PASSWORD || ''),
+    'import.meta.env.VITE_APP_DOMAIN': JSON.stringify(env.APP_DOMAIN || env.VITE_APP_DOMAIN || ''),
+    'import.meta.env.VITE_APP_ENV': JSON.stringify(env.APP_ENV || env.VITE_APP_ENV || ''),
+    'import.meta.env.VITE_JWT_SECRET': JSON.stringify(env.VITE_JWT_SECRET || ''),
     'import.meta.env.VITE_NO_PERSIST': JSON.stringify(env.VITE_NO_PERSIST || 'false'),
     'import.meta.env.VITE_NO_SERVER_SYNC': JSON.stringify(env.VITE_NO_SERVER_SYNC || 'false'),
     'import.meta.env.VITE_TELEGRAM_BOT_TOKEN': JSON.stringify(env.VITE_TELEGRAM_BOT_TOKEN || ''),
