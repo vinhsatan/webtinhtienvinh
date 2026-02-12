@@ -103,7 +103,7 @@ app.post('/kill-switch/global', requireKillSwitchAuth, async (req, res) => {
   }
 });
 
-app.post('/kill-switch/triggers/:id', requireKillSwitchAuth, async (req, res) => {
+app.get('/kill-switch/triggers/:id', requireKillSwitchAuth, async (req, res) => {
   const triggerId = req.params.id;
   const { on, by, reason } = req.body;
   try {
@@ -116,9 +116,4 @@ app.post('/kill-switch/triggers/:id', requireKillSwitchAuth, async (req, res) =>
 });
 
 export default app;
-
-// If run directly (dev), start server (note: requires ts-node or transpilation in production)
-if (process.argv[1] && process.argv[1].endsWith('api.ts')) {
-  const port = process.env.PORT ?? 3003;
-  app.listen(port, () => console.log(`Orchestrator API listening on ${port}`));
-}
+// api.ts is library-only: runtime must be provided by a single entrypoint (src/server/index.ts)

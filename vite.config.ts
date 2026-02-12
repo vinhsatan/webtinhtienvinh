@@ -121,7 +121,7 @@ export default defineConfig({
       protocol: 'ws',
       host: undefined, // Auto-detect from browser location
       port: 5173,
-      overlay: true, // Hiện thông báo khi có lỗi / cập nhật
+      overlay: false, // Disabled overlay so API responses are visible
     },
     warmup: {
       clientFiles: ['./src/app/**/*', './src/app/root.tsx', './src/app/routes.ts'],
