@@ -63,7 +63,71 @@ export default await createHonoServer({
 		// Provide simple development stubs so UI can load without a real DB
 		if (!(globalThis as any).dbPool) {
 			const createStubPool = () => ({
-				query: async (_text: string, _params?: any[]) => ({ rows: [], rowCount: 0 }),
+				query: async (text: string, params?: any[]) => {
+					const sql = String(text || '').toLowerCase();
+					// Simple product-aware stubs for common queries used in legacy handlers
+					if (sql.includes('from products') && sql.trim().startsWith('select')) {
+						const userId = (params && params[0]) || 'dev-user';
+						const row = {
+							id: 1,
+							user_id: userId,
+							name: 'Sample Product',
+							cost: 10,
+							price: 20,
+							wholesale_price: null,
+							tiktok_price: null,
+							shopee_price: null,
+							quantity: 5,
+							updated_at: new Date().toISOString(),
+						};
+						return { rows: [row], rowCount: 1 };
+					}
+
+					if (sql.startsWith('insert into products')) {
+						// mimic RETURNING *
+						const userId = (params && params[0]) || 'dev-user';
+						const row = {
+							id: Math.floor(Math.random() * 100000) + 2,
+							user_id: userId,
+							name: params && params[1] ? params[1] : 'New Product',
+							cost: params && params[2] ? params[2] : 0,
+							price: params && params[3] ? params[3] : 0,
+							wholesale_price: params && params[4] ? params[4] : null,
+							tiktok_price: params && params[5] ? params[5] : null,
+							shopee_price: params && params[6] ? params[6] : null,
+							quantity: params && params[7] ? params[7] : 0,
+							updated_at: new Date().toISOString(),
+						};
+						return { rows: [row], rowCount: 1 };
+					}
+
+					if (sql.startsWith('update products')) {
+						// return an updated row
+						const id = (params && params[params.length - 2]) || 1;
+						const userId = (params && params[params.length - 1]) || 'dev-user';
+						const row = {
+							id,
+							user_id: userId,
+							name: 'Updated Product',
+							cost: 12,
+							price: 22,
+							wholesale_price: null,
+							tiktok_price: null,
+							shopee_price: null,
+							quantity: 7,
+							updated_at: new Date().toISOString(),
+						};
+						return { rows: [row], rowCount: 1 };
+					}
+
+					if (sql.startsWith('delete from products')) {
+						const id = (params && params[0]) || 1;
+						return { rows: [{ id }], rowCount: 1 };
+					}
+
+					// default empty result
+					return { rows: [], rowCount: 0 };
+				},
 				// minimal interface for callers
 				end: async () => {},
 			});
