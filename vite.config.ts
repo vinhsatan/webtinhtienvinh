@@ -29,6 +29,11 @@ export default defineConfig({
     'import.meta.env.VITE_APP_ENV': JSON.stringify(env.APP_ENV || env.VITE_APP_ENV || ''),
     'import.meta.env.VITE_NO_PERSIST': JSON.stringify(env.VITE_NO_PERSIST || 'false'),
     'import.meta.env.VITE_NO_SERVER_SYNC': JSON.stringify(env.VITE_NO_SERVER_SYNC || 'false'),
+    // Single-user credentials: prefer non-VITE_ prefixed vars (server-safe), fall back to VITE_ prefixed.
+    // These are intentionally exposed to the client bundle ONLY in single_user mode where
+    // the owner is the sole user. Do NOT use real production secrets here.
+    'import.meta.env.VITE_AUTH_EMAIL': JSON.stringify(env.AUTH_EMAIL || env.VITE_AUTH_EMAIL || ''),
+    'import.meta.env.VITE_AUTH_PASSWORD': JSON.stringify(env.AUTH_PASSWORD || env.VITE_AUTH_PASSWORD || ''),
   },
   optimizeDeps: {
     // Explicitly include fast-glob, since it gets dynamically imported and we

@@ -85,7 +85,7 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     // If single-user mode is enabled and env credentials are set, validate locally
     if (AUTH_MODE === 'single_user' || AUTH_MODE === 'single-user' || AUTH_MODE === 'singleuser') {
-      if (email === ENV_AUTH_EMAIL && password === ENV_AUTH_PASSWORD) {
+      if (ENV_AUTH_EMAIL && email === ENV_AUTH_EMAIL && password === ENV_AUTH_PASSWORD) {
         const localToken = 'local-single-user-token';
         const localUser = { email, name: 'Owner' };
         setToken(localToken);
