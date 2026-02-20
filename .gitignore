@@ -9,3 +9,8 @@ logs/
 .vitest
 dev-server.log
 tmp-cloudflared-config.yml
+
+# Generated CI/simulation artifacts
+policy-check-result.json
+simulation/report.json
+simulation/error-flow-report.json
