@@ -1,3 +1,27 @@
+## 🚀 Chạy ngay (Local Dev)
+
+```bash
+# 1. Cài dependencies
+npm install
+
+# 2. Tạo file môi trường từ mẫu (.env đã được gitignore — không commit)
+cp .env.example .env
+
+# 3. Khởi động dev server
+npm run dev
+```
+
+Mở trình duyệt: **http://localhost:5173**
+
+**Đăng nhập mặc định (dev):**
+| Email | Mật khẩu |
+|-------|----------|
+| `admin@dev.local` | `dev123` |
+
+> Để dùng thông tin đăng nhập riêng, sửa `AUTH_EMAIL` và `AUTH_PASSWORD` trong file `.env` trước khi chạy.
+
+---
+
 **Project Summary**
 - **Description:**: Dự án frontend/backend (mono-repo) giữ lại mã nguồn và cấu hình cần thiết để chạy ứng dụng web; đã loại bỏ hầu hết các cấu hình Docker theo yêu cầu.
 - **Generated tree:**: See [repo-tree.mb](repo-tree.mb) for full tree (depth 4).
