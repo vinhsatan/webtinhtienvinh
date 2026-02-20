@@ -1,5 +1,7 @@
 import path from 'node:path';
+import fs from 'node:fs';
 import { reactRouter } from '@react-router/dev/vite';
+import { reactRouterHonoServer } from 'react-router-hono-server/dev';
 import { defineConfig, loadEnv } from 'vite';
 import babel from 'vite-plugin-babel';
 import tsconfigPaths from 'vite-tsconfig-paths';
@@ -31,7 +33,7 @@ export default defineConfig({
   optimizeDeps: {
     // Explicitly include fast-glob, since it gets dynamically imported and we
     // don't want that to cause a re-bundle.
-    include: ['lucide-react'],
+    include: ['fast-glob', 'lucide-react', 'xlsx'],
     exclude: [
       '@hono/auth-js/react',
       '@hono/auth-js',
@@ -51,6 +53,10 @@ export default defineConfig({
   plugins: [
     nextPublicProcessEnv(),
     restartEnvFileChange(),
+    reactRouterHonoServer({
+      serverEntryPoint: './__create/index.ts',
+      runtime: 'node',
+    }),
     babel({
       include: ['src/**/*.{js,jsx,ts,tsx}'], // or RegExp: /src\/.*\.[tj]sx?$/
       exclude: /node_modules/, // skip everything else
@@ -74,6 +80,15 @@ export default defineConfig({
         'src/components/**/*.{js,jsx}',
         'src/utils/**/*.js',
         'src/contexts/**/*.jsx',
+        // HMR options left as-is
+        proxy: {
+          '/api': {
+            target: 'http://127.0.0.1:3000',
+            changeOrigin: true,
+            secure: false,
+            ws: true
+          }
+        },
         'src/app/**/*.{js,jsx,ts,tsx,css}',
       ],
       delay: 150, // Phản hồi nhanh
@@ -102,14 +117,6 @@ export default defineConfig({
     allowedHosts: true,
     host: '0.0.0.0',
     port: 5173,
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:3000',
-        changeOrigin: true,
-        secure: false,
-        ws: true,
-      },
-    },
     watch: {
       usePolling: true, // Luôn dùng polling - đảm bảo detect thay đổi (Windows/WSL)
       interval: 200, // Kiểm tra mỗi 200ms
