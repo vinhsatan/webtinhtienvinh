@@ -1,11 +1,9 @@
 /**
  * Telegram Bot API Utilities
- * Kết nối với Telegram để gửi/nhận tin nhắn
+ * Gửi thông báo qua server-side proxy để bảo vệ bot token
  */
 
-const BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
-const CHAT_ID = import.meta.env.VITE_TELEGRAM_CHAT_ID;
-const API_BASE = `https://api.telegram.org/bot${BOT_TOKEN}`;
+const API_BASE = '/api/telegram/notify';
 
 // Helper để xử lý ký tự đặc biệt trong HTML Telegram
 const escapeHTML = (str) => {
@@ -17,24 +15,14 @@ const escapeHTML = (str) => {
 };
 
 /**
- * Gửi tin nhắn text đến Telegram
+ * Gửi tin nhắn text đến Telegram (qua server proxy)
  */
-export async function sendMessage(message, chatId = CHAT_ID) {
-  // Kiểm tra token đơn giản hơn để tránh lỗi cache giao diện
-  if (!BOT_TOKEN || BOT_TOKEN.length < 10) {
-    console.warn('[Telegram] Bot token chưa được cấu hình hoặc quá ngắn');
-    return { ok: false, error: 'Bot token not configured' };
-  }
-
+export async function sendMessage(message) {
   try {
-    const response = await fetch(`${API_BASE}/sendMessage`, {
+    const response = await fetch(API_BASE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: message,
-        parse_mode: 'HTML',
-      }),
+      body: JSON.stringify({ message }),
     });
 
     const data = await response.json();
@@ -43,38 +31,6 @@ export async function sendMessage(message, chatId = CHAT_ID) {
   } catch (error) {
     console.error('[Telegram] Lỗi kết nối:', error);
     return { ok: false, error: error.message };
-  }
-}
-
-/**
- * Lấy thông tin về bot (Dùng để kiểm tra kết nối)
- */
-export async function getBotInfo() {
-  if (!BOT_TOKEN || BOT_TOKEN.length < 10) return { ok: false };
-  try {
-    const response = await fetch(`${API_BASE}/getMe`);
-    return await response.json();
-  } catch (error) {
-    return { ok: false, error: error.message };
-  }
-}
-
-/**
- * Lấy cập nhật từ Telegram (Long polling)
- */
-export async function getUpdates(offset = 0, limit = 10) {
-  if (!BOT_TOKEN || BOT_TOKEN.length < 10) {
-    return { ok: false, result: [] };
-  }
-  try {
-    const response = await fetch(
-      `${API_BASE}/getUpdates?offset=${offset}&limit=${limit}&timeout=30`,
-      { method: 'GET' }
-    );
-    return await response.json();
-  } catch (error) {
-    console.error('[Telegram] Lỗi getUpdates:', error);
-    return { ok: false, result: [], error: error.message };
   }
 }
 

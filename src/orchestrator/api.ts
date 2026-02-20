@@ -116,6 +116,30 @@ app.get('/kill-switch/triggers/:id', requireKillSwitchAuth, async (req, res) => 
   }
 });
 
+// Telegram notification proxy — keeps bot token server-side only
+app.post('/api/telegram/notify', async (req, res) => {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!botToken || !chatId) {
+    return res.status(503).json({ ok: false, error: 'Telegram not configured' });
+  }
+  const { message } = req.body || {};
+  if (!message || typeof message !== 'string') {
+    return res.status(400).json({ ok: false, error: 'message is required' });
+  }
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'HTML' }),
+    });
+    const data = await response.json() as { ok: boolean };
+    res.json(data);
+  } catch (e: any) {
+    res.status(500).json({ ok: false, error: String(e) });
+  }
+});
+
 export default app;
 // api.ts is library-only: runtime must be provided by a single entrypoint (src/server/index.ts)
 
