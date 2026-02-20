@@ -4,3 +4,8 @@
 # React Router
 /.react-router/
 /build/
+dist/
+logs/
+.vitest
+dev-server.log
+tmp-cloudflared-config.yml
