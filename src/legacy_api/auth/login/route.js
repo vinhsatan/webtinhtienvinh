@@ -39,17 +39,31 @@ export async function POST(c) {
       AUTH_MODE === 'singleuser'
     ) {
       const envEmail = process.env.AUTH_EMAIL || '';
-      const envPassword = process.env.AUTH_PASSWORD || '';
+      const envPasswordHash = process.env.AUTH_PASSWORD_HASH || '';
+      const envPasswordPlain = process.env.AUTH_PASSWORD || ''; // legacy fallback
 
       if (!envEmail) {
         return c.json({ success: false, error: 'Cấu hình chưa đủ (AUTH_EMAIL chưa đặt)' }, 500);
       }
 
-      // Use timing-safe comparison to prevent timing attacks on env credentials
-      const emailMatch = safeCompare(email, envEmail);
-      const passMatch = safeCompare(password, envPassword);
+      // Email check (timing-safe)
+      if (!safeCompare(email, envEmail)) {
+        return c.json({ success: false, error: 'Email hoặc mật khẩu không đúng' }, 401);
+      }
 
-      if (!emailMatch || !passMatch) {
+      // Password check: prefer argon2 hash, fall back to timing-safe plaintext (dev only)
+      let passwordOk = false;
+      if (envPasswordHash) {
+        try {
+          passwordOk = await argon2.verify(envPasswordHash, password);
+        } catch (_) {
+          passwordOk = false;
+        }
+      } else if (envPasswordPlain) {
+        passwordOk = safeCompare(password, envPasswordPlain);
+      }
+
+      if (!passwordOk) {
         return c.json({ success: false, error: 'Email hoặc mật khẩu không đúng' }, 401);
       }
 

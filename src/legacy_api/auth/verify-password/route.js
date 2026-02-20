@@ -51,17 +51,31 @@ export async function POST(c) {
       return c.json({ success: false, error: 'Vui lòng nhập mật khẩu' }, 400);
     }
 
-    // --- Single-user mode: timing-safe compare against env vars (no DB required) ---
+    // --- Single-user mode: verify against hashed env var (no DB required) ---
     if (
       AUTH_MODE === 'single_user' ||
       AUTH_MODE === 'single-user' ||
       AUTH_MODE === 'singleuser'
     ) {
-      const envPassword = process.env.AUTH_PASSWORD || '';
-      if (!envPassword) {
-        return c.json({ success: false, error: 'Cấu hình chưa đủ (AUTH_PASSWORD chưa đặt)' }, 500);
+      const envPasswordHash = process.env.AUTH_PASSWORD_HASH || '';
+      const envPasswordPlain = process.env.AUTH_PASSWORD || ''; // legacy fallback
+
+      if (!envPasswordHash && !envPasswordPlain) {
+        return c.json({ success: false, error: 'Cấu hình chưa đủ (AUTH_PASSWORD_HASH chưa đặt)' }, 500);
       }
-      if (safeCompare(password, envPassword)) {
+
+      let passwordOk = false;
+      if (envPasswordHash) {
+        try {
+          passwordOk = await argon2.verify(envPasswordHash, password);
+        } catch (_) {
+          passwordOk = false;
+        }
+      } else {
+        passwordOk = safeCompare(password, envPasswordPlain);
+      }
+
+      if (passwordOk) {
         return c.json({ success: true });
       }
       return c.json({ success: false, error: 'Mật khẩu không đúng' }, 401);
