@@ -9,3 +9,10 @@ logs/
 .vitest
 dev-server.log
 tmp-cloudflared-config.yml
+
+# Generated / temp output files
+*.log
+*.patch
+policy-check-result.json
+simulation/report.json
+simulation/error-flow-report.json
