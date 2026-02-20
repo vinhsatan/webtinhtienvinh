@@ -9,7 +9,6 @@ import CashflowLedgerModule from "@/components/CashflowLedgerModule";
 import ReportsModule from "@/components/ReportsModule";
 import SettingsModule from "@/components/SettingsModule";
 import AdminModule from "@/components/AdminModule";
-import TelegramChatModule from "@/components/TelegramChatModule";
 import ChatSupportModule from "@/components/ChatSupportModule";
 // Use apiSync wrapper for products, transactions, and reset (auto-syncs with server)
 import {
@@ -766,10 +765,6 @@ export default function HomePage() {
             wallets={wallets}
             customers={customers}
           />
-        );
-      case "telegram":
-        return (
-          <TelegramChatModule key={dataResetKey} />
         );
       case "settings":
         return (
