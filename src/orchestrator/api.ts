@@ -1,4 +1,5 @@
 import express from 'express';
+import path from 'path';
 import bodyParser from 'body-parser';
 import { applyEnterpriseSecurity } from '../auth/enterprise';
 
@@ -117,3 +118,21 @@ app.get('/kill-switch/triggers/:id', requireKillSwitchAuth, async (req, res) => 
 
 export default app;
 // api.ts is library-only: runtime must be provided by a single entrypoint (src/server/index.ts)
+
+// Serve built client (if present) and fallback to index.html for SPA routes.
+try {
+  const clientRoot = path.join(process.cwd(), 'build', 'client');
+  app.use(express.static(clientRoot));
+
+  app.get('*', (req, res, next) => {
+    // Let existing API routes respond first
+    if (req.path.startsWith('/api') || req.path.startsWith('/triggers') || req.path.startsWith('/kill-switch') || req.path.startsWith('/metrics') || req.path.startsWith('/health')) {
+      return next();
+    }
+    res.sendFile(path.join(clientRoot, 'index.html'), (err) => {
+      if (err) next();
+    });
+  });
+} catch (e) {
+  // Best-effort: if build/client is not present or sendFile fails, do nothing.
+}

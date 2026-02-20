@@ -11,7 +11,7 @@ vi.mock('@aws-sdk/client-kms', () => {
   return { KMSClient, SignCommand };
 });
 
-import { signWithKms } from '../../../src/iam/kmsService';
+import { signWithKms } from '../../src/iam/kmsService';
 
 describe('kmsService', () => {
   it('signWithKms returns a Buffer signature', async () => {

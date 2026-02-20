@@ -34,10 +34,14 @@ export async function stopWorkflow(workflowId: string, reason?: string) {
 }
 
 export async function temporalHealth() {
+  // In unit tests or when no Temporal address is configured, avoid network calls.
+  if ((globalThis as any).__TEST__ && !process.env.TEMPORAL_ADDRESS) {
+    return { ok: false };
+  }
   try {
     await initTemporal();
     return { ok: true };
-  } catch (e) {
+  } catch (e: any) {
     return { ok: false, error: e.message };
   }
 }

@@ -1,7 +1,5 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import fs from 'node:fs/promises';
-import path from 'node:path';
 
 const RULES_PATH = path.resolve(process.cwd(), 'src', 'pdp', 'rules.json');
 
@@ -74,8 +72,12 @@ export async function evaluateRules(trigger: any, payload: any) {
     const when = r.when || {};
     if (Object.keys(when).length && !matchesWhen(when, trigger, payload)) continue;
 
-    // explicit allow
-    if (r.effect === 'allow') return { allowed: true, rule: r.id };
+    // explicit allow (but preserve flags like require_simulation)
+    if (r.effect === 'allow') {
+      const out: any = { allowed: true, rule: r.id };
+      if (r.require_simulation) out.requireSimulation = true;
+      return out;
+    }
 
     // deny-if-missing: ensure required fields exist in payload (dot-path)
     if (r.effect === 'deny-if-missing') {
@@ -101,8 +103,3 @@ export async function evaluateRules(trigger: any, payload: any) {
 }
 
 export default { loadRules, matchesWhen, evaluateRules };
-    }
-  }
-
-  return { allowed: true, rule: 'default' };
-}

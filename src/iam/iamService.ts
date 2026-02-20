@@ -5,9 +5,15 @@
 import jwt from 'jsonwebtoken';
 import { signWithKms } from './kmsService';
 
-const PRIVATE_KEY = process.env.IAM_PRIVATE_KEY || 'dev-key-change-me';
-const KMS_SIGN_URL = process.env.IAM_KMS_SIGN_URL; // optional external signer
-const AWS_KMS_KEY_ID = process.env.AWS_KMS_KEY_ID;
+function getPrivateKey() {
+  return process.env.IAM_PRIVATE_KEY || 'dev-key-change-me';
+}
+function getKmsSignUrl() {
+  return process.env.IAM_KMS_SIGN_URL;
+}
+function getAwsKmsKeyId() {
+  return process.env.AWS_KMS_KEY_ID;
+}
 
 export type TokenRequest = {
   subject: string;
@@ -55,6 +61,7 @@ export async function issueExecutionToken(req: TokenRequest) {
   };
 
   // Prefer external signer endpoint if configured
+  const KMS_SIGN_URL = getKmsSignUrl();
   if (KMS_SIGN_URL) {
     try {
       const resp = await postJson(KMS_SIGN_URL, { payload });
@@ -65,6 +72,7 @@ export async function issueExecutionToken(req: TokenRequest) {
   }
 
   // If AWS KMS key is configured, use it to sign the payload and return an envelope token
+  const AWS_KMS_KEY_ID = getAwsKmsKeyId();
   if (AWS_KMS_KEY_ID) {
     try {
       const message = Buffer.from(JSON.stringify(payload));
@@ -78,13 +86,13 @@ export async function issueExecutionToken(req: TokenRequest) {
   }
 
   // Fallback to local JWT signing (dev only)
-  return jwt.sign(payload, PRIVATE_KEY, { algorithm: 'HS256' });
+  return jwt.sign(payload, getPrivateKey(), { algorithm: 'HS256' });
 }
 
 export function verifyToken(token: string) {
   // Try local JWT verification first
   try {
-    return jwt.verify(token, PRIVATE_KEY) as any;
+    return jwt.verify(token, getPrivateKey()) as any;
   } catch (_err) {
     // If token is envelope from KMS (base64.payload.signature), we cannot verify locally without public key; return raw envelope
     if (token && token.includes('.')) {

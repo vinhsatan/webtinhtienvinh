@@ -85,6 +85,15 @@ export default defineConfig({
         'src/components/**/*.{js,jsx}',
         'src/utils/**/*.js',
         'src/contexts/**/*.jsx',
+        // HMR options left as-is
+        proxy: {
+          '/api': {
+            target: 'http://127.0.0.1:3000',
+            changeOrigin: true,
+            secure: false,
+            ws: true
+          }
+        },
         'src/app/**/*.{js,jsx,ts,tsx,css}',
       ],
       delay: 150, // Phản hồi nhanh

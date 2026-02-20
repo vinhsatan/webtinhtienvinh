@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mock the kmsService used by iamService
-vi.mock('../../../src/iam/kmsService', () => ({
+vi.mock('../../src/iam/kmsService', () => ({
   signWithKms: vi.fn(async () => Buffer.from([1, 2, 3]))
 }));
 
-import { issueExecutionToken, verifyToken } from '../../../src/iam/iamService';
+import { issueExecutionToken, verifyToken } from '../../src/iam/iamService';
 
 const ENV = { ...process.env };
 
