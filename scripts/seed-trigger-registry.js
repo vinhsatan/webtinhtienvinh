@@ -1,14 +1,8 @@
-import pkg from 'pg';
-const { Pool } = pkg;
+import { getPool, endPool } from './db-pool.js';
 
 (async ()=>{
   try {
-    const conn = process.env.PG_CONN || process.env.DB_CONN;
-    if(!conn){
-      console.error('PG_CONN/DB_CONN not set');
-      process.exit(2);
-    }
-    const pool = new Pool({connectionString: conn});
+    const pool = getPool();
 
     const samples = [
       { name: 'orders.created', description: 'Order created webhook', source: { type: 'webhook', owner: 'sales', safety_level: 'low' }, enabled: true },
@@ -29,7 +23,7 @@ const { Pool } = pkg;
       console.log('Inserted:', inserted.rows[0]);
     }
 
-    await pool.end();
+    await endPool();
     console.log('Seed complete');
     process.exit(0);
   } catch (e) {

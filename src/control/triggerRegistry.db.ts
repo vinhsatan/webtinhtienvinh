@@ -1,24 +1,18 @@
-import { Pool } from 'pg';
+import { getPool } from '../db/pool.js';
+import type { Pool } from 'pg';
 
-let pool: Pool | null = null;
-
-export function initPool(connString?: string) {
-  if (pool) return pool;
-  const conn = connString || process.env.DB_CONN || process.env.DATABASE_URL;
-  if (!conn) throw new Error('DB_CONN or DATABASE_URL environment variable is required');
-  pool = new Pool({ connectionString: conn });
-  return pool;
+/** @deprecated Pass no arguments; the shared pool from `src/db/pool.ts` is used automatically. */
+export function initPool(_connString?: string): Pool {
+  return getPool();
 }
 
+/** No-op: pool lifecycle is managed by the shared singleton in `src/db/pool.ts`. */
 export async function closePool() {
-  if (pool) {
-    await pool.end();
-    pool = null;
-  }
+  // Pool lifecycle is managed by the shared singleton; no-op here.
 }
 
 export async function listTriggers() {
-  const p = pool ?? initPool();
+  const p = getPool();
   const res = await p.query(
     'SELECT id, name, description, source, enabled, created_at, updated_at FROM trigger_registry WHERE deleted_at IS NULL ORDER BY created_at DESC'
   );
@@ -26,13 +20,13 @@ export async function listTriggers() {
 }
 
 export async function getTriggerById(id: string) {
-  const p = pool ?? initPool();
+  const p = getPool();
   const res = await p.query('SELECT * FROM trigger_registry WHERE id = $1 AND deleted_at IS NULL', [id]);
   return res.rows[0] || null;
 }
 
 export async function createTrigger({ id, name, description, source, enabled = true }: any) {
-  const p = pool ?? initPool();
+  const p = getPool();
   const res = await p.query(
     `INSERT INTO trigger_registry(id, name, description, source, enabled) VALUES($1, $2, $3, $4::jsonb, $5) RETURNING *`,
     [id || null, name, description || null, JSON.stringify(source || {}), enabled]
@@ -41,7 +35,7 @@ export async function createTrigger({ id, name, description, source, enabled = t
 }
 
 export async function updateTrigger(id: string, patch: any) {
-  const p = pool ?? initPool();
+  const p = getPool();
   const fields: string[] = [];
   const values: any[] = [];
   let idx = 1;
@@ -62,7 +56,7 @@ export async function updateTrigger(id: string, patch: any) {
 }
 
 export async function softDeleteTrigger(id: string) {
-  const p = pool ?? initPool();
+  const p = getPool();
   const res = await p.query('UPDATE trigger_registry SET deleted_at = now() WHERE id = $1 RETURNING *', [id]);
   return res.rows[0] || null;
 }

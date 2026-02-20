@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-const { Pool } = require('pg');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import crypto from 'crypto';
+import { getPool, endPool } from './db-pool.js';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_FILE = path.resolve(__dirname, '..', 'data', 'triggerRegistry.json');
 
 function canonicalize(obj) {
@@ -28,10 +30,7 @@ async function main() {
 
   const srcChecks = records.map(r => ({ id: r.id || null, hash: sha256(canonicalize({ name: r.name, source: r.source, enabled: r.enabled })) }));
 
-  const conn = process.env.DB_CONN || process.env.DATABASE_URL;
-  if (!conn) { console.error('DB_CONN or DATABASE_URL required to run verification'); process.exit(1); }
-
-  const pool = new Pool({ connectionString: conn });
+  const pool = getPool();
   try {
     const res = await pool.query('SELECT id, name, source, enabled FROM trigger_registry WHERE deleted_at IS NULL');
     const tgt = res.rows.map(r => ({ id: r.id, hash: sha256(canonicalize({ name: r.name, source: r.source, enabled: r.enabled })) }));
@@ -51,7 +50,7 @@ async function main() {
     console.log('Verification result:', JSON.stringify(summary, null, 2));
     if (mismatches.length > 0) process.exit(2);
   } finally {
-    await pool.end();
+    await endPool();
   }
 }
 

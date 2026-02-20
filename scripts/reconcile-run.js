@@ -1,14 +1,8 @@
-import pkg from 'pg';
-const { Pool } = pkg;
+import { getPool, endPool } from './db-pool.js';
 
 (async ()=>{
   try {
-    const conn = process.env.PG_CONN || process.env.DB_CONN;
-    if(!conn){
-      console.error('PG_CONN/DB_CONN not set');
-      process.exit(2);
-    }
-    const pool = new Pool({ connectionString: conn });
+    const pool = getPool();
     const res = await pool.query('SELECT id,name,source FROM trigger_registry WHERE deleted_at IS NULL');
     const triggers = res.rows;
     const findings = [];
@@ -19,7 +13,7 @@ const { Pool } = pkg;
       }
     }
     console.log('RECONCILER FINDINGS:', JSON.stringify(findings, null, 2));
-    await pool.end();
+    await endPool();
     process.exit(0);
   } catch (e) {
     console.error('ERROR:', e && (e.stack || e.message) || e);

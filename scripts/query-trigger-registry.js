@@ -1,12 +1,11 @@
-import pkg from 'pg';
 import { lookup } from 'dns/promises';
-const { Pool } = pkg;
+import { getPool, endPool } from './db-pool.js';
 
 (async ()=>{
   try {
-    const conn = process.env.PG_CONN || process.env.DB_CONN;
+    const conn = process.env.DATABASE_URL || process.env.DB_CONN;
     if(!conn){
-      console.error('PG_CONN/DB_CONN not set');
+      console.error('DATABASE_URL (or DB_CONN) not set');
       process.exit(2);
     }
 
@@ -50,16 +49,16 @@ const { Pool } = pkg;
     const maxAttempts = 5;
     const backoff = (attempt) => Math.min(500 * 2 ** (attempt - 1), 5000);
 
-    async function runQueriesWithRetries(connectionString) {
+    async function runQueriesWithRetries() {
       let lastErr;
       for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         try {
-          const pool = new Pool({ connectionString });
+          const pool = getPool();
           const cols = await pool.query("SELECT column_name,data_type,udt_name FROM information_schema.columns WHERE table_name='trigger_registry' ORDER BY ordinal_position");
           console.log('COLUMNS:', JSON.stringify(cols.rows, null, 2));
           const res = await pool.query('SELECT * FROM trigger_registry LIMIT 5');
           console.log('ROWS:', JSON.stringify(res.rows, null, 2));
-          await pool.end();
+          await endPool();
           return;
         } catch (e) {
           lastErr = e;
@@ -77,7 +76,7 @@ const { Pool } = pkg;
       }
     }
 
-    await runQueriesWithRetries(conn);
+    await runQueriesWithRetries();
   } catch (e) {
     // Better error presentation for troubleshooting
     if (e && e.code === 'ENOTFOUND') {
