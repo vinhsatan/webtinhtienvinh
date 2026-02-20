@@ -9,6 +9,3 @@ logs/
 .vitest
 dev-server.log
 tmp-cloudflared-config.yml
-
-# Local environment (contains secrets)
-.env
