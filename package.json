@@ -3,6 +3,8 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
+		"setup": "node ./scripts/setup-env.cjs",
+		"setup:prod": "node ./scripts/setup-env.cjs --prod",
 		"dev": "vite",
 		"build": "node ./scripts/lock-api.cjs && tsc && vite build",
 		"start": "node build/server/index.js",

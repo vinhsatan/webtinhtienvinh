@@ -4,8 +4,8 @@
 # 1. Cài dependencies
 npm install
 
-# 2. Tạo file môi trường từ mẫu (.env đã được gitignore — không commit)
-cp .env.example .env
+# 2. Tạo file .env (tự động sinh IAM_PRIVATE_KEY + hỏi email/password)
+npm run setup
 
 # 3. Khởi động dev server
 npm run dev
@@ -13,12 +13,12 @@ npm run dev
 
 Mở trình duyệt: **http://localhost:5173**
 
-**Đăng nhập mặc định (dev):**
+**Hoặc không cần nhập gì** — nhấn Enter để dùng mặc định:
 | Email | Mật khẩu |
 |-------|----------|
 | `admin@dev.local` | `dev123` |
 
-> Để dùng thông tin đăng nhập riêng, sửa `AUTH_EMAIL` và `AUTH_PASSWORD` trong file `.env` trước khi chạy.
+> Muốn đổi thông tin đăng nhập: chạy lại `npm run setup` bất cứ lúc nào.
 
 ---
 
@@ -38,9 +38,8 @@ git clone https://github.com/vinhsatan/webtinhtienvinh.git
 cd webtinhtienvinh
 npm install
 
-# 2. Cấu hình môi trường production
-cp .env.production.template .env
-nano .env   # Điền đầy đủ các giá trị (xem hướng dẫn trong file)
+# 2. Tạo .env production — tự động sinh IAM_PRIVATE_KEY, hỏi email + password
+npm run setup:prod
 
 # 3. Tạo bảng trong database (bỏ qua nếu VITE_NO_SERVER_SYNC=true)
 export DB_CONN="postgres://user:pass@localhost:5432/dbname"
