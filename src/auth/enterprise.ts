@@ -4,7 +4,7 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import jwt from 'jsonwebtoken';
 
-const PRIVATE_KEY = process.env.IAM_PRIVATE_KEY || process.env.VITE_JWT_SECRET || 'dev-key-change-me';
+const PRIVATE_KEY = process.env.IAM_PRIVATE_KEY || 'dev-key-change-me';
 
 function requireEnterpriseAuth(req: Request, res: Response, next: NextFunction) {
   // Allow health and metrics without auth
@@ -24,8 +24,8 @@ function requireEnterpriseAuth(req: Request, res: Response, next: NextFunction) 
   }
 
   // Fallback: single-user credentials via Basic auth (enterprise deployments should prefer JWT)
-  const singleUserEmail = process.env.VITE_AUTH_EMAIL || process.env.AUTH_EMAIL || '';
-  const singleUserPass = process.env.VITE_AUTH_PASSWORD || process.env.AUTH_PASSWORD || '';
+  const singleUserEmail = process.env.AUTH_EMAIL || '';
+  const singleUserPass = process.env.AUTH_PASSWORD || '';
   const basic = String(req.headers.authorization || '');
   if (basic.startsWith('Basic ')) {
     try {
