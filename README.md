@@ -1,3 +1,79 @@
+## 🚀 Chạy ngay (Local Dev)
+
+```bash
+# 1. Cài dependencies
+npm install
+
+# 2. Tạo file .env (tự động sinh IAM_PRIVATE_KEY + hỏi email/password)
+npm run setup
+
+# 3. Khởi động dev server
+npm run dev
+```
+
+Mở trình duyệt: **http://localhost:5173**
+
+**Hoặc không cần nhập gì** — nhấn Enter để dùng mặc định:
+| Email | Mật khẩu |
+|-------|----------|
+| `admin@dev.local` | `dev123` |
+
+> Muốn đổi thông tin đăng nhập: chạy lại `npm run setup` bất cứ lúc nào.
+
+---
+
+## 🖥️ Deploy lên VPS
+
+### Yêu cầu
+- Node.js 20+
+- PostgreSQL 14+ (nếu muốn đồng bộ dữ liệu lên server)
+- Nginx
+- PM2 (`npm install -g pm2`)
+
+### Các bước
+
+```bash
+# 1. Clone & cài dependencies
+git clone https://github.com/vinhsatan/webtinhtienvinh.git
+cd webtinhtienvinh
+npm install
+
+# 2. Tạo .env production — tự động sinh IAM_PRIVATE_KEY, hỏi email + password
+npm run setup:prod
+
+# 3. Tạo bảng trong database (bỏ qua nếu VITE_NO_SERVER_SYNC=true)
+export DB_CONN="postgres://user:pass@localhost:5432/dbname"
+for f in database/migrations/*.sql; do psql "$DB_CONN" -f "$f"; done
+
+# 4. Build
+npm run build
+
+# 5. Khởi động bằng PM2
+pm2 start "npm run prod" --name web
+pm2 save && pm2 startup
+```
+
+### Nginx
+```bash
+sudo cp nginx/app.production.conf /etc/nginx/sites-available/app.n8nvinhsatan.site
+sudo ln -s /etc/nginx/sites-available/app.n8nvinhsatan.site /etc/nginx/sites-enabled/
+sudo certbot --nginx -d app.n8nvinhsatan.site
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+### ⚠️ Bắt buộc đổi trước khi deploy
+| Biến | Ý nghĩa | Cách tạo |
+|------|---------|---------|
+| `AUTH_EMAIL` | Email đăng nhập | Email của bạn |
+| `AUTH_PASSWORD` | Mật khẩu đăng nhập | Mật khẩu mạnh |
+| `IAM_PRIVATE_KEY` | JWT secret | `node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"` |
+| `DB_CONN` | Kết nối PostgreSQL | `postgres://user:pass@localhost:5432/dbname` |
+
+### Chế độ không cần database
+Nếu chỉ dùng 1 người và không cần đồng bộ, đặt `VITE_NO_SERVER_SYNC=true` — dữ liệu sẽ lưu trong trình duyệt. **Lưu ý:** dữ liệu sẽ mất nếu xóa cache trình duyệt, hãy export CSV thường xuyên.
+
+---
+
 **Project Summary**
 - **Description:**: Dự án frontend/backend (mono-repo) giữ lại mã nguồn và cấu hình cần thiết để chạy ứng dụng web; đã loại bỏ hầu hết các cấu hình Docker theo yêu cầu.
 - **Generated tree:**: See [repo-tree.mb](repo-tree.mb) for full tree (depth 4).

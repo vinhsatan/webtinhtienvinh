@@ -29,6 +29,10 @@ export default defineConfig({
     'import.meta.env.VITE_APP_ENV': JSON.stringify(env.APP_ENV || env.VITE_APP_ENV || ''),
     'import.meta.env.VITE_NO_PERSIST': JSON.stringify(env.VITE_NO_PERSIST || 'false'),
     'import.meta.env.VITE_NO_SERVER_SYNC': JSON.stringify(env.VITE_NO_SERVER_SYNC || 'false'),
+    // NOTE: AUTH credentials are intentionally NOT exposed to the client bundle.
+    // Authentication is always validated server-side via /api/auth/login.
+    // VITE_AUTH_EMAIL is kept only as a display hint (never the password).
+    'import.meta.env.VITE_AUTH_EMAIL': JSON.stringify(env.AUTH_EMAIL || env.VITE_AUTH_EMAIL || ''),
   },
   optimizeDeps: {
     // Explicitly include fast-glob, since it gets dynamically imported and we
