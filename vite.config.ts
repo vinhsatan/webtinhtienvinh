@@ -80,15 +80,6 @@ export default defineConfig({
         'src/components/**/*.{js,jsx}',
         'src/utils/**/*.js',
         'src/contexts/**/*.jsx',
-        // HMR options left as-is
-        proxy: {
-          '/api': {
-            target: 'http://127.0.0.1:3000',
-            changeOrigin: true,
-            secure: false,
-            ws: true
-          }
-        },
         'src/app/**/*.{js,jsx,ts,tsx,css}',
       ],
       delay: 150, // Phản hồi nhanh
@@ -117,6 +108,14 @@ export default defineConfig({
     allowedHosts: true,
     host: '0.0.0.0',
     port: 5173,
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:3000',
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+      },
+    },
     watch: {
       usePolling: true, // Luôn dùng polling - đảm bảo detect thay đổi (Windows/WSL)
       interval: 200, // Kiểm tra mỗi 200ms
